@@ -1,0 +1,2 @@
+#!/bin/sh
+~/env/3/bin/python -tt -c "from mae import query_wikis; query_wikis.main();" "$@"
