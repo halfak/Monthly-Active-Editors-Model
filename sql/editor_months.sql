@@ -1,11 +1,11 @@
 SELECT
-    month,
     wiki,
+    month,
     user_id,
     user_name,
     user_registration,
-    archived,
-    revisions
+    SUM(revisions * archived) AS archived,
+    SUM(revisions) AS revisions
 FROM (
     SELECT
         CONCAT(LEFT(rev_timestamp, 4), "-", SUBSTRING(rev_timestamp, 7, 2)) AS month,
@@ -27,4 +27,6 @@ FROM (
     FROM archive
     GROUP BY LEFT(ar_timestamp, 6), ar_user
 ) AS editor_months
-INNER JOIN user USING (user_id);
+INNER JOIN user USING (user_id)
+GROUP BY wiki, month, user_id
+ORDER BY wiki, month;

@@ -69,7 +69,8 @@ def run(wikis, query, no_headers):
             raise
         except Exception as e:
             sys.stderr.write(traceback.format_exc())
-            pass
+        finally:
+            conn.close()
             
         
     
