@@ -18,9 +18,9 @@ Options:
   --active_edits=<kn>  Minimum edits to be considered "active" [default: 5].
 """
 import sys
-from docopt import docopt
 from collections import deque
 
+from docopt import docopt
 from menagerie.formatting import tsv
 from menagerie.iteration import aggregate
 
@@ -33,7 +33,7 @@ HEADERS = [
     'new_active_survival_rate',
     'old_active_editors',
     'old_active_survival_rate',
-    'other_active_editors'
+    'reactivated_editors'
 ]
 
 def parse_editor_months(f):
@@ -51,32 +51,24 @@ def main():
 
 class MonthlyActiveEditors:
     
-    def __init__(self, new=None, surviving=None, old=None, other=None):
+    def __init__(self, new=None, surviving=None, old=None, reactivated=None):
         self.new = set(new or [])
         self.surviving = set(surviving or [])
         self.old = set(old or [])
-        self.other = set(other or [])
+        self.reactivated = set(reactivated or [])
         
     def __contains__(self, id):
         return id in self.new or \
                id in self.surviving or \
                id in self.old or \
-               id in self.other
-    
-    def __or__(self, other):
-        return (self.new | self.surviving | self.old | self.other) | \
-               (other.new | other.surviving | other.old | other.other)
-    
-    def __and__(self, other):
-        return (self.new | self.surviving | self.old | self.other) & \
-               (other.new | other.surviving | other.old | other.other)
+               id in self.reactivated
     
     
-    def total(self):
+    def __len__(self):
         return len(self.new) + \
                len(self.surviving) + \
                len(self.old) + \
-               len(self.other)
+               len(self.reactivated)
 
 def run(editor_months, active_edits=5):
     
@@ -87,11 +79,11 @@ def run(editor_months, active_edits=5):
     for (wiki, month), editors in aggregate(editor_months, by=lambda em:(em.wiki, em.month)):
         for editor in editors:
             
-            user_id = editor.user_id 
+            user_id = editor.user_id
             user_registration = editor.user_registration
             
             if user_id == 0: pass
-            elif editor.revisions >= active_edits: 
+            elif editor.revisions >= active_edits:
                 # Active editor
                 
                 if user_registration != None and \
@@ -100,35 +92,33 @@ def run(editor_months, active_edits=5):
                     
                     mae[0].new.add(user_id)
                     
-                elif user_id in mae[1].new: 
+                elif user_id in mae[1].new:
                     # Surviving new active editor
                     
                     mae[0].surviving.add(user_id)
                     
-                elif user_id in mae[1] and user_id in mae[2]: 
+                elif user_id in mae[1]:
                     # Old active editor
                     
                     mae[0].old.add(user_id)
                     
-                else: 
+                else:
                     # Other active editor
                     
-                    mae[0].other.add(user_id)
+                    mae[0].reactivated.add(user_id)
                     
             
         
         writer.write([
             wiki,
             month,
-            mae[0].total(),
+            len(mae[0]),
             len(mae[0].new),
             len(mae[0].surviving),
             len(mae[0].surviving)/len(mae[1].new) if len(mae[1].new) > 0 else None,
             len(mae[0].old),
-            len(mae[0].old)/len(mae[1] & mae[2]) if len(mae[1] & mae[2]) > 0 else None,
-            len(mae[0].other)
+            len(mae[0].old)/(len(mae[1])-len(mae[1].new)) if len(mae[1])-len(mae[1].new) > 0 else None,
+            len(mae[0].reactivated)
         ])
         
         mae.appendleft(MonthlyActiveEditors()) # Updating current
-        
-        

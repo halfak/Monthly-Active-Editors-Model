@@ -8,7 +8,7 @@ SELECT
     SUM(revisions) AS revisions
 FROM (
     SELECT
-        CONCAT(LEFT(rev_timestamp, 4), "-", SUBSTRING(rev_timestamp, 7, 2)) AS month,
+        CONCAT(LEFT(rev_timestamp, 4), "-", SUBSTRING(rev_timestamp, 5, 2)) AS month,
         DATABASE() AS wiki,
         rev_user AS user_id,
         FALSE AS archived,
@@ -19,7 +19,7 @@ FROM (
     UNION ALL
 
     SELECT
-        CONCAT(LEFT(ar_timestamp, 4), "-", SUBSTRING(ar_timestamp, 7, 2)) AS month,
+        CONCAT(LEFT(ar_timestamp, 4), "-", SUBSTRING(ar_timestamp, 5, 2)) AS month,
         DATABASE() AS wiki,
         ar_user AS user_id,
         FALSE AS archived,
