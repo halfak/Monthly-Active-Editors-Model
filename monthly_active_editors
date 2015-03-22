@@ -1,2 +1,2 @@
-#!/bin/sh
-~/env/3/bin/python -tt -c "from mae import monthly_active_editors; monthly_active_editors.main();" "$@"
+#!/usr/bin/env python
+from mae import monthly_active_editors; monthly_active_editors.main();

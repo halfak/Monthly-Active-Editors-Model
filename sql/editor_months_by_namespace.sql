@@ -2,31 +2,32 @@ SELECT
     wiki,
     month,
     user_id,
-    user_name,
-    user_registration,
-    SUM(revisions * archived) AS archived,
+    page_namespace,
+    SUM(IF(archived, revisions, 0)) AS archived,
     SUM(revisions) AS revisions
 FROM (
     SELECT
-        LEFT(rev_timestamp, 6) AS month,
         DATABASE() AS wiki,
+        LEFT(rev_timestamp, 6) AS month,
         rev_user AS user_id,
+        page_namespace AS page_namespace,
         FALSE AS archived,
         COUNT(*) AS revisions
     FROM revision
-    GROUP BY LEFT(rev_timestamp, 6), rev_user
+    INNER JOIN page ON rev_page = page_id
+    GROUP BY 1,2,3,4
 
     UNION ALL
 
     SELECT
-        LEFT(ar_timestamp, 6) AS month,
         DATABASE() AS wiki,
+        LEFT(ar_timestamp, 6) AS month,
         ar_user AS user_id,
+        ar_namespace AS page_namespace,
         TRUE AS archived,
         COUNT(*) AS revisions
     FROM archive
-    GROUP BY LEFT(ar_timestamp, 6), ar_user
+    GROUP BY 1,2,3,4
 ) AS editor_months
-INNER JOIN user USING (user_id)
-GROUP BY wiki, month, user_id
+GROUP BY wiki, month, user_id, page_namespace
 ORDER BY wiki, month;

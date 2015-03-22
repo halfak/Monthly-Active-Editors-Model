@@ -20,11 +20,11 @@ data_loader = function(load, ident, cleanup=function(x){x}){
 tsv_loader = function(filename, ident, cleanup=function(x){x}){
 	data_loader(
 		function(verbose=T, reload=F){
-			if(verbose){cat("Loading ", filename, "...")} 
+			if(verbose){cat("Loading ", filename, "...")}
 			d = read.table(
-				filename, 
-				header=T, sep="\t", 
-				quote="", comment.char="", 
+				filename,
+				header=T, sep="\t",
+				quote="", comment.char="",
 				na.strings="NULL"
 			)
 			d = data.table(d)
@@ -96,6 +96,20 @@ ifor = function(x, ifval, orval){
 	)
 }
 
+ifna = function(x, then){
+	sapply(
+		x,
+		function(xval){
+			if(is.na(xval)){
+				then
+			}else{
+				xval
+			}
+		}
+	)
+	
+}
+
 clean.monthly_creations = function(dt){
 	dt$month_created = as.Date(dt$month_created)
 	dt$account_creation = sapply(
@@ -127,7 +141,7 @@ clean.monthly_creations = function(dt){
 					as.character(experience)
 				}
 			},
-			dt$experience, 
+			dt$experience,
 			dt$account_type
 		),
 		levels=c("anon", "autocreate", "day", "week", "month", "oldtimer")
@@ -153,4 +167,3 @@ wiki.table = function(dt){
 	
 	cat("|}")
 }
-

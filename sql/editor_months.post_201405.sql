@@ -14,6 +14,7 @@ FROM (
         FALSE AS archived,
         COUNT(*) AS revisions
     FROM revision
+    WHERE rev_timestamp >= "201406"
     GROUP BY LEFT(rev_timestamp, 6), rev_user
 
     UNION ALL
@@ -25,6 +26,7 @@ FROM (
         TRUE AS archived,
         COUNT(*) AS revisions
     FROM archive
+    WHERE ar_timestamp >= "201406"
     GROUP BY LEFT(ar_timestamp, 6), ar_user
 ) AS editor_months
 INNER JOIN user USING (user_id)

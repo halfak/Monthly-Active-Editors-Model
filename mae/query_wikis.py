@@ -1,4 +1,4 @@
-import argparse, sys, datetime, oursql, traceback
+import argparse, sys, datetime, traceback, pymysql
 from menagerie.formatting import tsv
 
 from . import database
@@ -54,7 +54,7 @@ def run(wikis, query, no_headers):
         
         try:
             conn = database.connection(wiki)
-            cursor = conn.cursor(oursql.Cursor)
+            cursor = conn.cursor(pymysql.cursors.Cursor)
             sys.stderr.write("Querying {0}\n".format(wiki))
             cursor.execute(query)
             
@@ -70,7 +70,8 @@ def run(wikis, query, no_headers):
         except Exception as e:
             sys.stderr.write(traceback.format_exc())
         finally:
-            conn.close()
+            try: conn.close()
+            except: pass
             
         
     

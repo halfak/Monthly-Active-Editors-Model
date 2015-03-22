@@ -1,4 +1,4 @@
-import getpass, os, oursql
+import getpass, os, pymysql
 from menagerie.decorators import memoized
 
 from . import config
@@ -17,10 +17,10 @@ def connection(wiki,
 	
 	host = wiki_host(wiki, host_string)
 	
-	return oursql.connect(
-		host=host,
+	return pymysql.connect(
+		host="analytics-store.eqiad.wmnet", #TODO: hard coded
 		db=wiki,
 		user="research",
 		read_default_file=defaults_file,
-		default_cursor=oursql.DictCursor
+		cursorclass=pymysql.cursors.DictCursor
 	)
